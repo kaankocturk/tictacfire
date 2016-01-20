@@ -1,0 +1,38 @@
+body{
+  background-color: beige;
+}
+.col{
+  display: inline-block;
+  width:30vw;
+  height:30vw;
+  max-width: 200px;
+  font-size: 150px;
+}
+
+.row, .col {
+  max-height: 200px;
+  vertical-align: top;
+}
+#x{
+  visibility: hidden;
+}
+#r1 .col2{
+  border-left:  2px solid black;
+  border-right: 2px solid black;
+}
+#r2 .col{
+  border-bottom:  2px solid black;
+  border-top:  2px solid black;
+}
+#r2 .col2{
+  border-right:  2px solid black;
+  border-left:  2px solid black;
+}
+#r3 .col2{
+  border-right:  2px solid black;
+  border-left:  2px solid black;
+}
+
+.main{
+  text-align: center;
+}
