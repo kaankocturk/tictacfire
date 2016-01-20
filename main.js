@@ -5,7 +5,7 @@ var playersRef = ref.child('players');
 var turnRef = ref.child('turn');
 var boxesRef = ref.child('boxes');
 var userid = new Date();
-var playerturn=0;
+var playerturn=0; //the game only messes up on reload etc.
 var champ='';
 var count=0;
 var turn;
@@ -18,10 +18,10 @@ var newUserRef = new Firebase('https://tictactoekk.firebaseio.com/presence/');
 
 function init(){
   $('#submit').click(enterName);
+  alert('Enter name to begin!');
 }
 
 amOnline.on('value', function(snapshot) {
-  console.log(snapshot.val());
   if (snapshot.val()) {
     userRef.onDisconnect().remove();
     userRef.set(true);
@@ -34,21 +34,22 @@ newUserRef.on("child_removed",function(){
 });
 
 newUserRef.on("child_added",function(){
-  console.log(users);
   if(!users){users=0;}
   users+=1;
   handleUsers();
 });
 
 turnRef.on('value', function(snapshot){
-  console.log(snapshot.val());
-  if(snapshot.val()){
-    playerturn = snapshot.val();
+  var t = snapshot.val();
+  if(t!==null){
+    playerturn = t;
   }
+  $('#turn').text(t ? 'X' : 'O');
 });
 
 
 function enterName(){
+
   console.log($('#username').val());
   playersRef.once('value', function(snapshot){
     console.log(snapshot.val());
@@ -63,8 +64,11 @@ function enterName(){
       turn = 1;
     }
     else{
+      alert('2 players are already in session');
       return;
     }
+  $('#users').text(player);
+  $('label, #username, #submit').css('visibility', 'hidden');
   $('#submit').off();
   });
 }
@@ -80,21 +84,20 @@ function handleUsers(){
 
 function startgame(){
   console.log('start');
-  userRef.off('child_added');
+  $('.col').empty();
   totals = [0,0,0,0,0,0,0,0];
+  boxes = [0,0,0,0,0,0,0,0,0];
   totalsRef.set(totals);
-  turnRef.set(0);
+  boxesRef.set(boxes);
+  turnRef.set(1);
   $('.col').click(clicked);
 }
 
 function stopgame(){
   // alert('user has left the game');
-  totals = [0,0,0,0,0,0,0,0];
-  $('.col').empty();
+  // totals = [0,0,0,0,0,0,0,0];
+  // $('.col').empty();
   $('.col').off();
-  boxes = [0,0,0,0,0,0,0,0,0];
-  totalsRef.set(totals);
-  boxesRef.set(boxes);
 }
 
   totalsRef.on('value', function(snapshot){
@@ -129,13 +132,21 @@ function checkstatus(){
     }
     if(champ){
       $('#turn').text(champ+ ' is the CHAMPION!');
-      $('.col').off();
+      stopgame();
+      champ = '';
+      setTimeout(startgame, 5000);
+      alert('New game in 5 seconds');
   }
-    else if(count===9)$('#turn').text( 'It\'s a draw!');
+    else if(count===9){
+    $('#turn').text( 'It\'s a draw!');
+    stopgame();
+    setTimeout(startgame, 5000);
+    alert('New game in 5 seconds');
+  }
   }
 
 function clicked(e){
-      if(playerturn!===turn){return;}
+      if(playerturn!==turn){return;}
       else{
         count++;
         var $clicked = $(e.target);
